@@ -194,7 +194,7 @@ You can fix the issues and push updates — the PR will revalidate automatically
 
 You can open a submission PR here:
 
-👉 [Submit your skill](https://github.com/block/Agent-Skills/compare/main...your-branch?expand=1)
+👉 [Submit your skill](https://github.com/block/agent-skills/compare)
 
 ---
 
