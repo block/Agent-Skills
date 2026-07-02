@@ -511,12 +511,12 @@ def compute_ce_report(
     for command in commands:
         all_executions = []
 
-        for session in sessions_data:
-            session_messages = session.get("messages", [])
-            sid = session.get("session_id", "")
+        for run_data in sessions_data:
+            msg_list = run_data.get("messages", [])
+            run_id = run_data.get("session_id", "")
 
             execs = detect_command_in_session(
-                command, session_messages, sid
+                command, msg_list, run_id
             )
             all_executions.extend(execs)
 
