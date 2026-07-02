@@ -29,7 +29,7 @@ class InstructionCategory(Enum):
     IMPLICIT_COMMAND = "implicit_command"
     FORMATTING_RULE = "formatting_rule"
     BOUNDARY = "boundary_declaration"
-    SESSION_PATTERN = "session_pattern"
+    WORKFLOW_PATTERN = "workflow_pattern"
     VERIFICATION = "verification_step"
     ROUTING = "routing_rule"
 
@@ -57,7 +57,7 @@ class ImplicitCommand:
 @dataclass
 class CommandExecution:
     trigger_found: bool
-    session_id: str
+    run_id: str
     message_index: int
     expected_signals: List[str]
     detected_signals: List[str]
@@ -80,7 +80,7 @@ class ConfigVersion:
     content_hash: str
     first_seen: str
     last_measured: str
-    session_count: int
+    run_count: int
     ce_score: Optional[float]
 
 
@@ -262,12 +262,12 @@ def get_ce_band(score: float) -> str:
         return CEBand.MISCONFIGURED.value
 
 
-def get_confidence_label(session_count: int) -> str:
-    if session_count >= 20:
+def get_confidence_label(run_count: int) -> str:
+    if run_count >= 20:
         return "Very High"
-    elif session_count >= 13:
+    elif run_count >= 13:
         return "High"
-    elif session_count >= 6:
+    elif run_count >= 6:
         return "Moderate"
     else:
         return "Low (insufficient data)"
@@ -359,15 +359,15 @@ def parse_implicit_commands(file_path: str) -> List[ImplicitCommand]:
     return commands
 
 
-def detect_command_in_session(
+def detect_command_in_run(
     command: ImplicitCommand,
-    session_messages: List[dict],
-    session_id: str = "",
+    msg_sequence: List[dict],
+    run_id: str = "",
 ) -> List[CommandExecution]:
     executions = []
     trigger = command.trigger.lower().strip()
 
-    for i, msg in enumerate(session_messages):
+    for i, msg in enumerate(msg_sequence):
         if msg.get("role") != "user":
             continue
 
@@ -388,8 +388,8 @@ def detect_command_in_session(
 
             response_text = ""
             has_tool_call = False
-            for j in range(i + 1, min(i + 6, len(session_messages))):
-                next_msg = session_messages[j]
+            for j in range(i + 1, min(i + 6, len(msg_sequence))):
+                next_msg = msg_sequence[j]
                 if next_msg.get("role") == "assistant":
                     if next_msg.get("type") == "toolRequest":
                         has_tool_call = True
@@ -433,7 +433,7 @@ def detect_command_in_session(
 
             executions.append(CommandExecution(
                 trigger_found=True,
-                session_id=session_id,
+                run_id=run_id,
                 message_index=i,
                 expected_signals=positive,
                 detected_signals=detected,
@@ -444,7 +444,7 @@ def detect_command_in_session(
     return executions
 
 
-def load_sessions_from_db(limit: int = 20) -> List[dict]:
+def load_runs_from_db(limit: int = 20) -> List[dict]:
     import sqlite3
     db_path = Path.home() / ".local" / "share" / "goose" / "sessions" / "sessions.db"
     if not db_path.exists():
@@ -457,13 +457,13 @@ def load_sessions_from_db(limit: int = 20) -> List[dict]:
         SELECT id FROM sessions
         ORDER BY created_at DESC LIMIT ?
     ''', (limit,))
-    session_ids = [row[0] for row in cursor.fetchall()]
+    run_ids = [row[0] for row in cursor.fetchall()]
 
-    sessions_data = []
-    for sid in session_ids:
+    runs_data = []
+    for sid in run_ids:
         cursor.execute('''
             SELECT role, content_json FROM messages
-            WHERE session_id = ?
+            WHERE run_id = ?
             ORDER BY created_timestamp ASC
         ''', (sid,))
 
@@ -489,18 +489,18 @@ def load_sessions_from_db(limit: int = 20) -> List[dict]:
                 elif item_type == "toolResponse":
                     pass
 
-        sessions_data.append({
-            "session_id": sid,
+        runs_data.append({
+            "run_id": sid,
             "messages": messages,
         })
 
     conn.close()
-    return sessions_data
+    return runs_data
 
 
 def compute_ce_report(
     commands: List[ImplicitCommand],
-    sessions_data: List[dict],
+    runs_data: List[dict],
     adt_zone: str = "Expected",
 ) -> CEReport:
     command_reports = []
@@ -511,11 +511,11 @@ def compute_ce_report(
     for command in commands:
         all_executions = []
 
-        for run_data in sessions_data:
+        for run_data in runs_data:
             msg_list = run_data.get("messages", [])
-            run_id = run_data.get("session_id", "")
+            run_id = run_data.get("run_id", "")
 
-            execs = detect_command_in_session(
+            execs = detect_command_in_run(
                 command, msg_list, run_id
             )
             all_executions.extend(execs)
@@ -559,11 +559,11 @@ def compute_ce_report(
     token_waste_pct = (dead_token_cost / total_token_cost * 100) if total_token_cost > 0 else 0.0
 
     band = get_ce_band(overall_score)
-    confidence = get_confidence_label(len(sessions_data))
+    confidence = get_confidence_label(len(runs_data))
     quadrant = calculate_adt_ce_quadrant(adt_zone, overall_score)
 
     import random
-    nudge = random.choice(CE_BAND_NUDGES.get(band, ["Run more sessions for better data."]))
+    nudge = random.choice(CE_BAND_NUDGES.get(band, ["Run more analysis cycles for better data."]))
     reflection = CE_BAND_REFLECTIONS.get(band, "What could you explore more deeply?")
 
     return CEReport(
@@ -620,7 +620,8 @@ def format_ce_report(report: CEReport) -> str:
 
     if report.dead_commands:
         lines.append("")
-        lines.append(f" DEAD INSTRUCTIONS (Token cost: ~{sum(c.token_cost for c in report.dead_commands)} tokens/session)")
+        dead_cost = sum(c.token_cost for c in report.dead_commands)
+        lines.append(f" DEAD INSTRUCTIONS (Cost: ~{dead_cost} tokens per run)")
         lines.append("-" * 60)
         for dc in report.dead_commands:
             lines.append(f" - \"{dc.trigger}\" (~{dc.token_cost} tokens)")

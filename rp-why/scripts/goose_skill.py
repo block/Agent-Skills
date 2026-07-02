@@ -22,7 +22,7 @@ from rp_why_core import aggregate_session_metadata, calculate_adt_zone, estimate
 from rp_why_ce import (
     parse_implicit_commands, find_agents_md_files, compute_ce_report,
     format_ce_report, check_config_changed, save_config_version,
-    load_sessions_from_db, ConfigVersion, hash_file,
+    load_runs_from_db, ConfigVersion, hash_file,
 )
 from typing import Dict
 from pathlib import Path
@@ -276,7 +276,7 @@ class RPWhySkill:
         if not all_commands:
             return "\nNo implicit commands found in AGENTS.md. CE Phase 1 measures implicit command adherence."
 
-        sessions_data = load_sessions_from_db(limit=20)
+        sessions_data = load_runs_from_db(limit=20)
         if not sessions_data:
             return "\nNo session history found."
 
