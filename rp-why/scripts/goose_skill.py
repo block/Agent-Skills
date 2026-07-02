@@ -3,7 +3,8 @@
 Goose Skill: rp-why - Three Dimensions of AI Collaboration
 
 Provides DOK assessments, baseline analysis, comparison reports,
-and longitudinal analysis directly within Goose conversations.
+longitudinal analysis, and configuration effectiveness measurement
+directly within Goose conversations.
 
 Commands:
     /rp-why init      - Generate baseline from all session history
@@ -11,12 +12,18 @@ Commands:
     /rp-why current   - Analyze current session
     /rp-why compare   - Compare current session to baseline
     /rp-why overall   - Full longitudinal report
+    /rp-why ce        - Configuration Effectiveness report
 """
 
 from __future__ import annotations
 
 from rp_why_baseline import RPWhyAnalyzer
-from rp_why_core import aggregate_session_metadata
+from rp_why_core import aggregate_session_metadata, calculate_adt_zone, estimate_tm_tier
+from rp_why_ce import (
+    parse_implicit_commands, find_agents_md_files, compute_ce_report,
+    format_ce_report, check_config_changed, save_config_version,
+    ConfigVersion, hash_file,
+)
 from typing import Dict
 from pathlib import Path
 import json
@@ -254,6 +261,75 @@ class RPWhySkill:
             self.analyzer.close()
 
 
+    def ce_report(self) -> str:
+        """Configuration Effectiveness report for AGENTS.md adherence."""
+        from datetime import datetime as dt
+
+        agents_files = find_agents_md_files()
+        if not agents_files:
+            return "\nNo AGENTS.md files found. CE requires at least one configuration file."
+
+        all_commands = []
+        for fp in agents_files:
+            all_commands.extend(parse_implicit_commands(fp))
+
+        if not all_commands:
+            return "\nNo implicit commands found in AGENTS.md. CE Phase 1 measures implicit command adherence."
+
+        if not self.analyzer.connect():
+            return "\nCould not connect to sessions database."
+
+        try:
+            prompts = self.analyzer.get_all_user_prompts()
+            if not prompts:
+                return "\nNo session history found."
+
+            session_meta = self.analyzer.get_session_metadata()
+
+            session_ids = list({p['session_id'] for p in prompts})
+            recent_sessions = sorted(session_ids)[-20:]
+
+            sessions_data = []
+            for sid in recent_sessions:
+                session_prompts = [p for p in prompts if p['session_id'] == sid]
+                human_msgs = [{"text": p.get("text", ""), "session_id": sid}
+                              for p in session_prompts]
+                agent_msgs = [{"text": p.get("response_text", "")}
+                              for p in session_prompts]
+                tool_calls_list = [p.get("tool_calls") for p in session_prompts]
+
+                sessions_data.append({
+                    "session_id": sid,
+                    "human_messages": human_msgs,
+                    "agent_messages": agent_msgs,
+                    "tool_calls": tool_calls_list,
+                })
+
+            baseline = self.analyzer.load_baseline()
+            adt_zone = "Expected"
+            if baseline:
+                adt_zone = baseline.get("three_dimensions", {}).get("adt_zone", "Expected")
+
+            report = compute_ce_report(all_commands, sessions_data, adt_zone)
+
+            data_dir = str(Path.home() / ".config" / "goose")
+            changed, current_hash = check_config_changed(data_dir)
+            if changed and current_hash:
+                version = ConfigVersion(
+                    file_path="|".join(agents_files),
+                    content_hash=current_hash,
+                    first_seen=dt.now().isoformat(),
+                    last_measured=dt.now().isoformat(),
+                    session_count=len(recent_sessions),
+                    ce_score=report.overall_score,
+                )
+                save_config_version(data_dir, version)
+
+            return format_ce_report(report)
+        finally:
+            self.analyzer.close()
+
+
 # --- Goose skill interface functions ---
 
 def init() -> str:
@@ -337,6 +413,26 @@ def token_spend() -> str:
     return skill.token_spend_report()
 
 
+def ce() -> str:
+    """
+    Configuration Effectiveness report.
+
+    Measures alignment between declared AGENTS.md configuration and
+    observed session behavior. CE feeds into ADT (Agentic Delegation
+    Trust) as empirical grounding for trust assessment.
+
+    Usage:
+        /rp-why ce
+
+    Returns:
+        CE score, implicit command adherence rates, dead instruction
+        detection, token waste analysis, ADT x CE quadrant, and
+        growth nudges for configuration improvement.
+    """
+    skill = RPWhySkill()
+    return skill.ce_report()
+
+
 if __name__ == '__main__':
     import sys
 
@@ -356,7 +452,9 @@ if __name__ == '__main__':
         print(overall())
     elif command in ('token-spend', 'tokens'):
         print(token_spend())
+    elif command == 'ce':
+        print(ce())
     else:
         print(f"Unknown command: {command}")
-        print("Usage: python goose_skill.py [init|baseline|current|compare|overall|token-spend]")
+        print("Usage: python goose_skill.py [init|baseline|current|compare|overall|token-spend|ce]")
         sys.exit(1)
