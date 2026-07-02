@@ -361,40 +361,60 @@ def parse_implicit_commands(file_path: str) -> List[ImplicitCommand]:
 
 def detect_command_in_session(
     command: ImplicitCommand,
-    human_messages: List[dict],
-    agent_messages: List[dict],
-    tool_calls: List[dict],
+    session_messages: List[dict],
+    session_id: str = "",
 ) -> List[CommandExecution]:
     executions = []
     trigger = command.trigger.lower().strip()
 
-    for i, msg in enumerate(human_messages):
+    for i, msg in enumerate(session_messages):
+        if msg.get("role") != "user":
+            continue
+
         text = msg.get("text", "").lower().strip()
 
-        if text == trigger or text.rstrip("?!.") == trigger.rstrip("?!."):
+        is_match = (text == trigger or text.rstrip("?!.") == trigger.rstrip("?!."))
+
+        if not is_match and trigger == "#n complete":
+            is_match = bool(re.match(r'^#\d+ complete$', text))
+
+        if not is_match and trigger in ("done", "sent"):
+            is_match = text in ("done", "sent", "done.", "sent.")
+
+        if is_match:
             fingerprints = IMPLICIT_COMMAND_FINGERPRINTS.get(trigger, {})
             positive = fingerprints.get("positive_signals", [])
             negative = fingerprints.get("negative_signals", [])
 
             response_text = ""
-            if i < len(agent_messages):
-                response_text = agent_messages[i].get("text", "").lower()
+            has_tool_call = False
+            for j in range(i + 1, min(i + 6, len(session_messages))):
+                next_msg = session_messages[j]
+                if next_msg.get("role") == "assistant":
+                    if next_msg.get("type") == "toolRequest":
+                        has_tool_call = True
+                        tool_info = next_msg.get("tool_name", "") + " " + next_msg.get("tool_args", "")
+                        response_text += " " + tool_info.lower()
+                    elif next_msg.get("type") == "text":
+                        response_text += " " + next_msg.get("text", "").lower()
+                    break
+                elif next_msg.get("role") == "assistant_continued":
+                    if next_msg.get("type") == "toolRequest":
+                        has_tool_call = True
+                        tool_info = next_msg.get("tool_name", "") + " " + next_msg.get("tool_args", "")
+                        response_text += " " + tool_info.lower()
+                    elif next_msg.get("type") == "text":
+                        response_text += " " + next_msg.get("text", "").lower()
 
-            tool_text = ""
-            if i < len(tool_calls):
-                tool_text = json.dumps(tool_calls[i]).lower() if tool_calls[i] else ""
-
-            combined = response_text + " " + tool_text
             detected = []
-
             for signal in positive:
                 if signal == "tool_call_present":
-                    if tool_calls and i < len(tool_calls) and tool_calls[i]:
+                    if has_tool_call:
                         detected.append(signal)
                 elif signal == "no_question_in_response":
                     if "?" not in response_text[:200]:
                         detected.append(signal)
-                elif re.search(signal, combined):
+                elif re.search(signal, response_text):
                     detected.append(signal)
 
             override = False
@@ -413,7 +433,7 @@ def detect_command_in_session(
 
             executions.append(CommandExecution(
                 trigger_found=True,
-                session_id=msg.get("session_id", ""),
+                session_id=session_id,
                 message_index=i,
                 expected_signals=positive,
                 detected_signals=detected,
@@ -422,6 +442,60 @@ def detect_command_in_session(
             ))
 
     return executions
+
+
+def load_sessions_from_db(limit: int = 20) -> List[dict]:
+    import sqlite3
+    db_path = Path.home() / ".local" / "share" / "goose" / "sessions" / "sessions.db"
+    if not db_path.exists():
+        return []
+
+    conn = sqlite3.connect(str(db_path))
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        SELECT id FROM sessions
+        ORDER BY created_at DESC LIMIT ?
+    ''', (limit,))
+    session_ids = [row[0] for row in cursor.fetchall()]
+
+    sessions_data = []
+    for sid in session_ids:
+        cursor.execute('''
+            SELECT role, content_json FROM messages
+            WHERE session_id = ?
+            ORDER BY created_timestamp ASC
+        ''', (sid,))
+
+        messages = []
+        for role, content_json in cursor.fetchall():
+            content = json.loads(content_json) if content_json else []
+            for item in content:
+                item_type = item.get("type", "")
+                if item_type == "text" and item.get("text", "").strip():
+                    messages.append({
+                        "role": role,
+                        "type": "text",
+                        "text": item.get("text", ""),
+                    })
+                elif item_type == "toolRequest":
+                    tc = item.get("toolCall", {})
+                    messages.append({
+                        "role": "assistant",
+                        "type": "toolRequest",
+                        "tool_name": tc.get("name", ""),
+                        "tool_args": json.dumps(tc.get("arguments", {}))[:500],
+                    })
+                elif item_type == "toolResponse":
+                    pass
+
+        sessions_data.append({
+            "session_id": sid,
+            "messages": messages,
+        })
+
+    conn.close()
+    return sessions_data
 
 
 def compute_ce_report(
@@ -438,12 +512,11 @@ def compute_ce_report(
         all_executions = []
 
         for session in sessions_data:
-            human_msgs = session.get("human_messages", [])
-            agent_msgs = session.get("agent_messages", [])
-            tool_calls_list = session.get("tool_calls", [])
+            session_messages = session.get("messages", [])
+            sid = session.get("session_id", "")
 
             execs = detect_command_in_session(
-                command, human_msgs, agent_msgs, tool_calls_list
+                command, session_messages, sid
             )
             all_executions.extend(execs)
 

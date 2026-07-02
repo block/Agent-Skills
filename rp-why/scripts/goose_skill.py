@@ -22,7 +22,7 @@ from rp_why_core import aggregate_session_metadata, calculate_adt_zone, estimate
 from rp_why_ce import (
     parse_implicit_commands, find_agents_md_files, compute_ce_report,
     format_ce_report, check_config_changed, save_config_version,
-    ConfigVersion, hash_file,
+    load_sessions_from_db, ConfigVersion, hash_file,
 )
 from typing import Dict
 from pathlib import Path
@@ -276,58 +276,31 @@ class RPWhySkill:
         if not all_commands:
             return "\nNo implicit commands found in AGENTS.md. CE Phase 1 measures implicit command adherence."
 
-        if not self.analyzer.connect():
-            return "\nCould not connect to sessions database."
+        sessions_data = load_sessions_from_db(limit=20)
+        if not sessions_data:
+            return "\nNo session history found."
 
-        try:
-            prompts = self.analyzer.get_all_user_prompts()
-            if not prompts:
-                return "\nNo session history found."
+        baseline = self.analyzer.load_baseline()
+        adt_zone = "Expected"
+        if baseline:
+            adt_zone = baseline.get("three_dimensions", {}).get("adt_zone", "Expected")
 
-            session_meta = self.analyzer.get_session_metadata()
+        report = compute_ce_report(all_commands, sessions_data, adt_zone)
 
-            session_ids = list({p['session_id'] for p in prompts})
-            recent_sessions = sorted(session_ids)[-20:]
+        data_dir = str(Path.home() / ".config" / "goose")
+        changed, current_hash = check_config_changed(data_dir)
+        if changed and current_hash:
+            version = ConfigVersion(
+                file_path="|".join(agents_files),
+                content_hash=current_hash,
+                first_seen=dt.now().isoformat(),
+                last_measured=dt.now().isoformat(),
+                session_count=len(sessions_data),
+                ce_score=report.overall_score,
+            )
+            save_config_version(data_dir, version)
 
-            sessions_data = []
-            for sid in recent_sessions:
-                session_prompts = [p for p in prompts if p['session_id'] == sid]
-                human_msgs = [{"text": p.get("text", ""), "session_id": sid}
-                              for p in session_prompts]
-                agent_msgs = [{"text": p.get("response_text", "")}
-                              for p in session_prompts]
-                tool_calls_list = [p.get("tool_calls") for p in session_prompts]
-
-                sessions_data.append({
-                    "session_id": sid,
-                    "human_messages": human_msgs,
-                    "agent_messages": agent_msgs,
-                    "tool_calls": tool_calls_list,
-                })
-
-            baseline = self.analyzer.load_baseline()
-            adt_zone = "Expected"
-            if baseline:
-                adt_zone = baseline.get("three_dimensions", {}).get("adt_zone", "Expected")
-
-            report = compute_ce_report(all_commands, sessions_data, adt_zone)
-
-            data_dir = str(Path.home() / ".config" / "goose")
-            changed, current_hash = check_config_changed(data_dir)
-            if changed and current_hash:
-                version = ConfigVersion(
-                    file_path="|".join(agents_files),
-                    content_hash=current_hash,
-                    first_seen=dt.now().isoformat(),
-                    last_measured=dt.now().isoformat(),
-                    session_count=len(recent_sessions),
-                    ce_score=report.overall_score,
-                )
-                save_config_version(data_dir, version)
-
-            return format_ce_report(report)
-        finally:
-            self.analyzer.close()
+        return format_ce_report(report)
 
 
 # --- Goose skill interface functions ---
