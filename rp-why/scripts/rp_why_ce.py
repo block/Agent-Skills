@@ -2,8 +2,8 @@
 rp-why Configuration Effectiveness (CE): AGENTS.md adherence measurement.
 
 CE measures alignment between declared agent configuration and observed
-session behavior. It feeds into ADT (Agentic Delegation Trust) as
-empirical grounding for trust assessment.
+collaboration patterns. Provides empirical grounding for the ADT
+(Agentic Delegation Trust) dimension.
 
 Phase 1: Implicit command detection and scoring.
 
