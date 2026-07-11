@@ -1,0 +1,110 @@
+/* editor.css — in-browser WYSIWYG layer for claude-edit-skill
+ * Adds: inline text editing, add image / text box, drag / resize / delete,
+ * localStorage persistence, export. Only visible when edit mode is on. */
+
+/* ---- floating launcher (always visible) ---- */
+#ed-launch{
+  position:fixed; right:18px; bottom:16px; z-index:9000;
+  font-family:var(--font-sans,sans-serif); font-size:13px; font-weight:600;
+  color:#fff; background:var(--accent,#d97757);
+  border:none; border-radius:999px; padding:10px 16px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4); cursor:pointer;
+  display:flex; align-items:center; gap:7px;
+  transition:transform .15s ease, filter .15s ease;
+}
+#ed-launch:hover{ transform:translateY(-1px); filter:brightness(1.06); }
+
+/* ---- toolbar (only in edit mode) ---- */
+#ed-bar{
+  position:fixed; top:14px; left:50%; transform:translateX(-50%);
+  z-index:9000; display:none; gap:8px; align-items:center;
+  padding:8px 10px; border-radius:12px;
+  background:rgba(28,25,23,.92); backdrop-filter:blur(10px);
+  border:1px solid var(--border-strong,rgba(217,119,87,.32));
+  box-shadow:0 14px 40px rgba(0,0,0,.5);
+  font-family:var(--font-sans,sans-serif);
+}
+body.ed-on #ed-bar{ display:flex; }
+#ed-bar button{
+  font-size:13px; font-weight:600; color:var(--text-1,#f5efe9);
+  background:var(--surface-2,#332d29); border:1px solid var(--border,rgba(217,119,87,.16));
+  border-radius:8px; padding:7px 11px; cursor:pointer; white-space:nowrap;
+  transition:background .12s ease;
+}
+#ed-bar button:hover{ background:var(--accent,#d97757); color:#fff; }
+#ed-bar button.primary{ background:var(--accent,#d97757); color:#fff; border-color:transparent; }
+#ed-bar button:disabled{ opacity:.38; cursor:default; }
+#ed-bar button:disabled:hover{ background:var(--surface-2,#332d29); color:var(--text-1,#f5efe9); }
+#ed-bar .ed-sep{ width:1px; height:22px; background:var(--border,rgba(217,119,87,.22)); margin:0 2px; }
+#ed-bar .ed-page{ font-family:var(--font-mono,monospace); font-size:12px; color:var(--text-3,#9a8b7d); padding:0 4px; }
+
+/* ---- filmstrip (reorder by drag) ---- */
+#ed-film{
+  position:fixed; left:0; right:0; bottom:0; z-index:8999; display:none;
+  gap:10px; align-items:stretch; padding:12px 14px; overflow-x:auto;
+  background:rgba(22,19,16,.96); backdrop-filter:blur(10px);
+  border-top:1px solid var(--border-strong,rgba(217,119,87,.32));
+}
+#ed-film .ed-chip{
+  flex:0 0 auto; width:150px; min-height:62px; cursor:grab;
+  display:flex; flex-direction:column; gap:6px; padding:10px 12px;
+  background:var(--surface,#262220); border:1px solid var(--border,rgba(217,119,87,.18));
+  border-radius:10px; font-family:var(--font-sans,sans-serif); user-select:none;
+  transition:border-color .12s, transform .12s;
+}
+#ed-film .ed-chip:hover{ border-color:var(--accent,#d97757); }
+#ed-film .ed-chip.cur{ border-color:var(--accent,#d97757); box-shadow:0 0 0 1px var(--accent,#d97757) inset; }
+#ed-film .ed-chip.dragging{ opacity:.45; }
+#ed-film .ed-chip.over{ transform:translateY(-3px); border-color:var(--accent-2,#e8a87c); border-style:dashed; }
+#ed-film .ed-chip .ci{ font-family:var(--font-mono,monospace); font-size:11px; color:var(--accent,#d97757); font-weight:700; }
+#ed-film .ed-chip .ct{ font-size:13px; color:var(--text-1,#f5efe9); line-height:1.35; }
+body.ed-on #ed-launch{ bottom:74px; }   /* lift launcher above an open filmstrip */
+
+/* ---- editable text affordance ---- */
+body.ed-on [data-ed-text]{
+  outline:1px dashed rgba(217,119,87,.45); outline-offset:3px;
+  border-radius:3px; cursor:text;
+}
+body.ed-on [data-ed-text]:hover{ outline-color:var(--accent,#d97757); }
+body.ed-on [data-ed-text]:focus{
+  outline:2px solid var(--accent,#d97757); background:rgba(217,119,87,.07);
+}
+
+/* ---- added objects (images / text boxes) ---- */
+.ed-obj{ position:absolute; z-index:5; cursor:grab; }
+.ed-obj img{ display:block; width:100%; height:auto; border-radius:8px; pointer-events:none; }
+.ed-obj.ed-textbox{
+  min-width:80px; padding:8px 12px; color:var(--text-1,#f5efe9);
+  font-family:var(--font-sans,sans-serif); font-size:22px; line-height:1.4;
+}
+body.ed-on .ed-obj{ outline:1px solid rgba(217,119,87,.4); }
+body.ed-on .ed-obj.sel{ outline:2px solid var(--accent,#d97757); cursor:grab; }
+body:not(.ed-on) .ed-obj{ cursor:default; }
+
+/* resize handle + delete button on selected obj (edit mode only) */
+.ed-handle{
+  position:absolute; right:-7px; bottom:-7px; width:14px; height:14px;
+  background:var(--accent,#d97757); border:2px solid #fff; border-radius:50%;
+  cursor:nwse-resize; display:none; z-index:6;
+}
+.ed-del{
+  position:absolute; right:-10px; top:-12px; width:22px; height:22px;
+  background:#e06c5e; color:#fff; border:none; border-radius:50%;
+  font-size:13px; line-height:1; cursor:pointer; display:none; z-index:6;
+}
+body.ed-on .ed-obj.sel .ed-handle,
+body.ed-on .ed-obj.sel .ed-del{ display:block; }
+
+/* toast */
+#ed-toast{
+  position:fixed; bottom:70px; right:18px; z-index:9001;
+  background:rgba(28,25,23,.95); color:var(--text-1,#f5efe9);
+  border:1px solid var(--accent,#d97757); border-radius:10px;
+  padding:10px 16px; font-family:var(--font-sans,sans-serif); font-size:13px;
+  opacity:0; transform:translateY(8px); transition:opacity .2s, transform .2s;
+  pointer-events:none;
+}
+#ed-toast.show{ opacity:1; transform:translateY(0); }
+
+/* hide all editor chrome in presenter-preview iframes */
+body.is-preview #ed-launch, body.is-preview #ed-bar{ display:none !important; }

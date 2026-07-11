@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>editable-html-slides · demo</title>
+<style>
+  :root{
+    --bg:#1c1917;--surface:#262220;--surface-2:#332d29;
+    --border:rgba(217,119,87,.16);--border-strong:rgba(217,119,87,.32);
+    --text-1:#f5efe9;--text-2:#d8cabd;--text-3:#9a8b7d;
+    --accent:#d97757;--accent-2:#e8a87c;
+    --font-sans:'Inter','Noto Sans SC',system-ui,sans-serif;
+    --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text-1);font-family:var(--font-sans)}
+  .deck{width:100vw;height:100vh}
+  .slide{display:none;width:100vw;height:100vh;padding:72px 96px;
+    flex-direction:column;justify-content:center;gap:14px}
+  .slide.is-active{display:flex}
+  .kicker{font-family:var(--font-mono);font-size:13px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--text-3)}
+  h1{font-size:clamp(40px,5.4vw,72px);line-height:1.12;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,3.4vw,46px);line-height:1.2;margin-bottom:8px}
+  .accent{color:var(--accent)}
+  p,li{font-size:20px;line-height:1.6;color:var(--text-2)}
+  ul{padding-left:1.2em;display:flex;flex-direction:column;gap:8px}
+  .card{background:var(--surface);border:1px solid var(--border);
+    border-top:3px solid var(--accent);border-radius:12px;padding:22px 24px;max-width:680px}
+  .hint{position:fixed;left:12px;bottom:12px;font-size:11px;color:#9a8b7d88;
+    font-family:var(--font-mono);pointer-events:none}
+</style>
+<link rel="stylesheet" href="../assets/editor.css">
+</head>
+<body>
+<div class="deck">
+
+  <section class="slide is-active" data-title="Cover">
+    <p class="kicker">editable-html-slides · demo</p>
+    <h1>Make any HTML deck<br><span class="accent">editable in the browser</span></h1>
+    <p>Press <b>E</b> (or the ✎ button) → click this text to rewrite it.</p>
+  </section>
+
+  <section class="slide" data-title="Try it">
+    <p class="kicker">try these</p>
+    <h2>Things you can do in <span class="accent">edit mode</span></h2>
+    <ul>
+      <li>Click any text and type — it autosaves.</li>
+      <li>🖼 Add an image (or paste with ⌘/Ctrl+V) and drag it.</li>
+      <li>T Add a free-floating text box.</li>
+      <li>↶ Undo / ↷ Redo with ⌘/Ctrl+Z.</li>
+      <li>▦ Open the filmstrip and drag to reorder slides.</li>
+      <li>⬇ Export a clean standalone HTML.</li>
+    </ul>
+  </section>
+
+  <section class="slide" data-title="Closing">
+    <h2>That's it.</h2>
+    <div class="card">
+      <p>Two files — <span class="accent">editor.js</span> + <span class="accent">editor.css</span> —
+      layered on top of your deck. No build, no dependencies. Now go ship.</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="hint">← → navigate · E edit</div>
+
+<!-- minimal self-contained runtime (a real deck would use its own, e.g. html-ppt runtime.js) -->
+<script>
+(function () {
+  var slides = [].slice.call(document.querySelectorAll(".deck .slide"));
+  var cur = 0;
+  function show(n) {
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, i) { s.classList.toggle("is-active", i === cur); });
+  }
+  function fromHash() { var m = (location.hash || "").match(/#\/(\d+)/); if (m) show(parseInt(m[1], 10) - 1); }
+  window.addEventListener("keydown", function (e) {
+    if (e.target && e.target.isContentEditable) return;
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") show(cur + 1);
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") show(cur - 1);
+  });
+  window.addEventListener("hashchange", fromHash);
+  show(0); fromHash();
+})();
+</script>
+<!-- the editor must load AFTER the runtime above -->
+<script src="../assets/editor.js"></script>
+</body>
+</html>

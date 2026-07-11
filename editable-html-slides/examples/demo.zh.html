@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>editable-html-slides · 中文演示</title>
+<style>
+  :root{
+    --bg:#1c1917;--surface:#262220;--surface-2:#332d29;
+    --border:rgba(217,119,87,.16);--border-strong:rgba(217,119,87,.32);
+    --text-1:#f5efe9;--text-2:#d8cabd;--text-3:#9a8b7d;
+    --accent:#d97757;--accent-2:#e8a87c;
+    --font-sans:'Inter','Noto Sans SC',system-ui,sans-serif;
+    --font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text-1);font-family:var(--font-sans)}
+  .deck{width:100vw;height:100vh}
+  .slide{display:none;width:100vw;height:100vh;padding:72px 96px;
+    flex-direction:column;justify-content:center;gap:14px}
+  .slide.is-active{display:flex}
+  .kicker{font-family:var(--font-mono);font-size:13px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--text-3)}
+  h1{font-size:clamp(40px,5.4vw,72px);line-height:1.14;letter-spacing:-.01em}
+  h2{font-size:clamp(28px,3.4vw,46px);line-height:1.2;margin-bottom:8px}
+  .accent{color:var(--accent)}
+  p,li{font-size:20px;line-height:1.7;color:var(--text-2)}
+  ul{padding-left:1.2em;display:flex;flex-direction:column;gap:8px}
+  .card{background:var(--surface);border:1px solid var(--border);
+    border-top:3px solid var(--accent);border-radius:12px;padding:22px 24px;max-width:720px}
+  .hint{position:fixed;left:12px;bottom:12px;font-size:11px;color:#9a8b7d88;
+    font-family:var(--font-mono);pointer-events:none}
+</style>
+<link rel="stylesheet" href="../assets/editor.css">
+</head>
+<body>
+<div class="deck">
+
+  <section class="slide is-active" data-title="封面">
+    <p class="kicker">editable-html-slides · 中文演示</p>
+    <h1>让任意 HTML 演示<br><span class="accent">在浏览器里随手改</span></h1>
+    <p>按 <b>E</b>（或点 ✎ 按钮）→ 直接点这段文字就能改。</p>
+  </section>
+
+  <section class="slide" data-title="试试看">
+    <p class="kicker">编辑模式能做什么</p>
+    <h2>点哪改哪 · 加图 · <span class="accent">换页序</span></h2>
+    <ul>
+      <li>点任意文字直接改，自动保存。</li>
+      <li>🖼 加图片（或 ⌘/Ctrl+V 粘贴），拖动缩放。</li>
+      <li>T 加一个自由文本框。</li>
+      <li>↶ 撤销 / ↷ 重做（⌘/Ctrl+Z）。</li>
+      <li>▦ 打开缩略图条，拖动换页顺序。</li>
+      <li>⬇ 导出干净的单文件 HTML。</li>
+    </ul>
+  </section>
+
+  <section class="slide" data-title="结束">
+    <h2>就这么简单。</h2>
+    <div class="card">
+      <p>两个文件 —— <span class="accent">editor.js</span> + <span class="accent">editor.css</span> ——
+      叠在你的 deck 上。零依赖、不毁原设计、保留逐字稿。开干。</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="hint">← → 翻页 · E 编辑</div>
+
+<script>
+(function () {
+  var slides = [].slice.call(document.querySelectorAll(".deck .slide"));
+  var cur = 0;
+  function show(n) {
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, i) { s.classList.toggle("is-active", i === cur); });
+  }
+  function fromHash() { var m = (location.hash || "").match(/#\/(\d+)/); if (m) show(parseInt(m[1], 10) - 1); }
+  window.addEventListener("keydown", function (e) {
+    if (e.target && e.target.isContentEditable) return;
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") show(cur + 1);
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") show(cur - 1);
+  });
+  window.addEventListener("hashchange", fromHash);
+  show(0); fromHash();
+})();
+</script>
+<script src="../assets/editor.js"></script>
+</body>
+</html>
