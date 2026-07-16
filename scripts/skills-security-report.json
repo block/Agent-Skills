@@ -1,0 +1,507 @@
+{
+  "status": "WARN",
+  "generatedAt": "2026-03-09T17:54:13.981Z",
+  "scanned_skills": [
+    "api-setup",
+    "beads",
+    "code-review",
+    "frontend-design",
+    "goose-blog-post",
+    "rp-why",
+    "scoutqa",
+    "testing-strategy"
+  ],
+  "totals": {
+    "warnings": 54,
+    "failures": 0,
+    "scannedFiles": 15
+  },
+  "findings": [
+    {
+      "severity": "WARN",
+      "skill": "api-setup",
+      "file": "api-setup/templates/config.template.json",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 3,
+      "snippet": "  \"endpoint\": \"https://api.example.com/v1\","
+    },
+    {
+      "severity": "WARN",
+      "skill": "frontend-design",
+      "file": "frontend-design/SKILL.md",
+      "ruleId": "content:entropy-high-line",
+      "message": "High-entropy line detected (entropy=4.43, len=354) — possible obfuscation",
+      "line": 22,
+      "snippet": "- **Tone**: Pick an extreme: brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian, etc. There are…"
+    },
+    {
+      "severity": "WARN",
+      "skill": "frontend-design",
+      "file": "frontend-design/SKILL.md",
+      "ruleId": "content:entropy-high-line",
+      "message": "High-entropy line detected (entropy=4.46, len=362) — possible obfuscation",
+      "line": 39,
+      "snippet": "- **Motion**: Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Motion library for React when available. Focus on high-impact moments: one well-orchestrated page load with staggered reveals (anim…"
+    },
+    {
+      "severity": "WARN",
+      "skill": "frontend-design",
+      "file": "frontend-design/SKILL.md",
+      "ruleId": "content:entropy-high-line",
+      "message": "High-entropy line detected (entropy=4.35, len=350) — possible obfuscation",
+      "line": 41,
+      "snippet": "- **Backgrounds & Visual Details**: Create atmosphere and depth rather than defaulting to solid colors. Add contextual effects and textures that match the overall aesthetic. Apply creative forms like gradient meshes, noise textures, geometr…"
+    },
+    {
+      "severity": "WARN",
+      "skill": "frontend-design",
+      "file": "frontend-design/SKILL.md",
+      "ruleId": "content:entropy-high-line",
+      "message": "High-entropy line detected (entropy=4.41, len=319) — possible obfuscation",
+      "line": 47,
+      "snippet": "**IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing,…"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/README.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 3,
+      "snippet": "A skill that guides AI agents through writing and publishing blog posts for the [block/goose](https://github.com/block/goose) open source project."
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/README.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 8,
+      "snippet": "npx skills add https://github.com/block/agent-skills --skill goose-blog-post"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "content:entropy-high-file",
+      "message": "Overall file entropy is high (entropy=4.96) — review if this is obfuscated/packed content",
+      "line": 1,
+      "snippet": "---"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 16,
+      "snippet": "Write blog posts for the [block/goose](https://github.com/block/goose) open source project blog powered by Docusaurus."
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 69,
+      "snippet": "  image_url: https://avatars.githubusercontent.com/u/<github-id>?v=4"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 77,
+      "snippet": "Ask the user for any missing details (name, title, GitHub username, social handles). The `image_url` can be derived from their GitHub profile: `https://avatars.githubusercontent.com/u/<id>?v=4`. Look up their GitHub user ID if needed:"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 180,
+      "snippet": "- When linking to goose docs: `https://block.github.io/goose/`"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 181,
+      "snippet": "- When linking to the repo: `https://github.com/block/goose`"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 182,
+      "snippet": "- When linking to extensions: `https://block.github.io/goose/extensions`"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 192,
+      "snippet": "  <meta property=\"og:url\" content=\"https://block.github.io/goose/blog/YYYY/MM/DD/slug-title\" />"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 194,
+      "snippet": "  <meta property=\"og:image\" content=\"https://block.github.io/goose/assets/images/BANNER_FILENAME_WITH_HASH.png\" />"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 199,
+      "snippet": "  <meta name=\"twitter:image\" content=\"https://block.github.io/goose/assets/images/BANNER_FILENAME_WITH_HASH.png\" />"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 208,
+      "snippet": "- `og:url` — the production URL: `https://block.github.io/goose/blog/YYYY/MM/DD/slug-title`"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 213,
+      "snippet": "When first creating the post, use `https://block.github.io/goose/assets/images/BANNER_FILENAME_WITH_HASH.png` as the placeholder for `og:image` and `twitter:image`. The `BANNER_FILENAME_WITH_HASH` portion will be replaced with the real file…"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 228,
+      "snippet": "This starts a local dev server at `http://localhost:3000` with hot reloading."
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 234,
+      "snippet": "   `http://localhost:3000/goose/assets/images/banner-a1b2c3d4e5f6.png`"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 237,
+      "snippet": "   `https://block.github.io/goose/assets/images/banner-a1b2c3d4e5f6.png`"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 320,
+      "snippet": "Building an MCP server took about an hour and saved our team countless context switches. If you want to learn more, check out the [MCP documentation](https://modelcontextprotocol.io/introduction) and the [goose extensions directory](https:/…"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 325,
+      "snippet": "  <meta property=\"og:url\" content=\"https://block.github.io/goose/blog/2025/07/01/custom-mcp-server\" />"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 327,
+      "snippet": "  <meta property=\"og:image\" content=\"https://block.github.io/goose/assets/images/banner-a1b2c3d4e5f6.png\" />"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 332,
+      "snippet": "  <meta name=\"twitter:image\" content=\"https://block.github.io/goose/assets/images/banner-a1b2c3d4e5f6.png\" />"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/references/BLOG-POST-TEMPLATE.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 36,
+      "snippet": "  <meta property=\"og:url\" content=\"https://block.github.io/goose/blog/YYYY/MM/DD/slug-title\" />"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/references/BLOG-POST-TEMPLATE.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 38,
+      "snippet": "  <meta property=\"og:image\" content=\"https://block.github.io/goose/assets/images/FILENAME_FROM_PREVIEW\" />"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/references/BLOG-POST-TEMPLATE.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 43,
+      "snippet": "  <meta name=\"twitter:image\" content=\"https://block.github.io/goose/assets/images/FILENAME_FROM_PREVIEW\" />"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/references/BLOG-POST-TEMPLATE.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 55,
+      "snippet": "  image_url: https://avatars.githubusercontent.com/u/GITHUB_USER_ID?v=4"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/references/BLOG-POST-TEMPLATE.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 88,
+      "snippet": "- goose docs: https://block.github.io/goose/"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/references/BLOG-POST-TEMPLATE.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 89,
+      "snippet": "- goose repo: https://github.com/block/goose"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/references/BLOG-POST-TEMPLATE.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 90,
+      "snippet": "- Extensions directory: https://block.github.io/goose/extensions"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/references/BLOG-POST-TEMPLATE.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 91,
+      "snippet": "- MCP docs: https://modelcontextprotocol.io/introduction"
+    },
+    {
+      "severity": "WARN",
+      "skill": "goose-blog-post",
+      "file": "goose-blog-post/references/BLOG-POST-TEMPLATE.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 99,
+      "snippet": "5. Production URL: `https://block.github.io/goose/assets/images/<filename>`"
+    },
+    {
+      "severity": "WARN",
+      "skill": "rp-why",
+      "file": "rp-why/README.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 3,
+      "snippet": "> **🪿 Goose-Specific Skill** — This skill is designed for [Goose](https://github.com/block/goose) and reads from Goose's session directory to analyze your AI collaboration patterns."
+    },
+    {
+      "severity": "WARN",
+      "skill": "rp-why",
+      "file": "rp-why/README.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 10,
+      "snippet": "npx skills add https://github.com/block/agent-skills --skill rp-why"
+    },
+    {
+      "severity": "WARN",
+      "skill": "rp-why",
+      "file": "rp-why/README.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 32,
+      "snippet": "- [Goose](https://github.com/block/goose) AI agent"
+    },
+    {
+      "severity": "WARN",
+      "skill": "rp-why",
+      "file": "rp-why/SKILL.md",
+      "ruleId": "content:entropy-high-file",
+      "message": "Overall file entropy is high (entropy=5.11) — review if this is obfuscated/packed content",
+      "line": 1,
+      "snippet": "---"
+    },
+    {
+      "severity": "WARN",
+      "skill": "rp-why",
+      "file": "rp-why/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 35,
+      "snippet": "npx skills add https://github.com/block/agent-skills --skill rp-why"
+    },
+    {
+      "severity": "WARN",
+      "skill": "rp-why",
+      "file": "rp-why/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 288,
+      "snippet": "  https://steve-yegge.medium.com/welcome-to-gas-town-4f25ee16dd04"
+    },
+    {
+      "severity": "WARN",
+      "skill": "rp-why",
+      "file": "rp-why/rp_why_baseline.py",
+      "ruleId": "content:entropy-high-file",
+      "message": "Overall file entropy is high (entropy=4.51) — review if this is obfuscated/packed content",
+      "line": 1,
+      "snippet": "#!/usr/bin/env python3"
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 47,
+      "snippet": "- **Browser URL** (e.g., `https://app.scoutqa.ai/t/019b831d-xxx`) for live monitoring"
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 80,
+      "snippet": "scoutqa --url \"https://example.com\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 89,
+      "snippet": "scoutqa --url \"https://shop.example.com\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 98,
+      "snippet": "scoutqa --url \"https://example.com\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 107,
+      "snippet": "scoutqa --url \"https://example.com\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 116,
+      "snippet": "scoutqa --url \"https://example.com\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 125,
+      "snippet": "scoutqa --url \"https://example.com\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 134,
+      "snippet": "scoutqa --url \"http://localhost:3000/register\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 149,
+      "snippet": "scoutqa --url \"https://app.example.com\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 155,
+      "snippet": "scoutqa --url \"https://app.example.com\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 161,
+      "snippet": "scoutqa --url \"https://app.example.com\" --prompt \""
+    },
+    {
+      "severity": "WARN",
+      "skill": "scoutqa",
+      "file": "scoutqa/SKILL.md",
+      "ruleId": "network:url",
+      "message": "Suspicious indicator detected (review required)",
+      "line": 194,
+      "snippet": "View: https://app.scoutqa.ai/t/019b831d-xxx"
+    }
+  ]
+}
