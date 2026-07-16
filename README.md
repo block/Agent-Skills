@@ -40,6 +40,8 @@ This will install the skill locally so compatible agents (like Goose or Claude D
 You can browse all available skills via the Goose Skills Marketplace:
 👉 https://block.github.io/goose/skills
 
+For Chinese users who want a direct search and install entry, see [Skills宝](https://skilery.com) for skills discovery and installation.
+
 There you can:
 
 - Read the full skill before installing
