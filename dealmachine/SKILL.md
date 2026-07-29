@@ -1,6 +1,6 @@
 ---
 name: dealmachine
-description: Use DealMachine property, owner, people, and company data for sales prospecting, lead generation, contact enrichment, comparable sales, and targeted exports.
+description: Use DealMachine property, owner, and people data for sales prospecting, lead generation, contact enrichment, comparable sales, and targeted exports.
 license: MIT
 author: DealMachine
 version: "1.0"
@@ -15,7 +15,7 @@ tags:
 
 # DealMachine
 
-Use DealMachine to turn a user's sales, marketing, lead generation, or real estate research request into a precise property, people, company, enrichment, comparable-sales, or export workflow.
+Use DealMachine to turn a user's sales, marketing, lead generation, or real estate research request into a precise property, people, enrichment, comparable-sales, or export workflow.
 
 ## Choose the interface
 
@@ -41,9 +41,9 @@ Read [REFERENCE.md](REFERENCE.md) when you need the exact MCP Tool ID, CLI comma
 
 Identify:
 
-- Entity: property, person, company, or list
+- Entity: property, person, or list
 - Location: address, city, county, ZIP code, state, coordinates, or APN
-- Criteria: ownership, equity, property characteristics, demographics, company attributes, or other filters
+- Criteria: ownership, equity, property characteristics, demographics, or other filters
 - Output: count, preview, detailed results, enrichment, comparable sales, list, or export
 - Fields: only the data needed for the task
 - Contact audience: owners, residents, both, or none
@@ -55,7 +55,7 @@ Ask one focused question only when a missing detail would materially change the 
 
 ### Discovery
 
-- Use `dealmachine_filters` to find valid property, people, or company filters.
+- Use `dealmachine_filters` to find valid property or people filters.
 - Use `dealmachine_fields` to find valid output fields.
 - Use `dealmachine_location_search` to resolve supported locations.
 - Use `dealmachine_usage` before large paid operations.
@@ -69,11 +69,10 @@ Ask one focused question only when a missing detail would materially change the 
 - Use `dealmachine_property_export` only after confirming scope and credit impact.
 - Use `dealmachine_comps` for comparable sales.
 
-### People and company workflows
+### People workflows
 
-- Use `dealmachine_people_count` or `dealmachine_company_count` before a broad search.
-- Use the matching singular tool family, such as `dealmachine_people_search` or `dealmachine_company_search`, for results.
-- Company export is available through `dealmachine_company_export`. Confirm scope and credit impact first.
+- Use `dealmachine_people_count` before a broad search.
+- Use `dealmachine_people_search` for results and the matching get tools for known IDs.
 - People search and lookup are available through MCP. Use the CLI for a people export.
 
 ### Enrichment
@@ -104,9 +103,7 @@ Use JSON output for automation. Store complex request bodies in a temporary JSON
 The CLI also supports saved lists, exports, account activity, address
 validation, CRM, tasks, dialer, direct mail, and developer license management.
 Use `dm <command> --help` and the command map in
-[REFERENCE.md](REFERENCE.md) before operating those workflows. Company search
-is currently available through the hosted MCP server, not as a `dm companies`
-CLI group.
+[REFERENCE.md](REFERENCE.md) before operating those workflows.
 
 ## Present the result
 
@@ -119,7 +116,7 @@ CLI group.
 
 ## Boundaries
 
-- Do not claim a phone number, email, valuation, ownership fact, or company attribute that the result does not contain.
+- Do not claim a phone number, email, valuation, ownership fact, or other attribute that the result does not contain.
 - Do not describe a count as a completed export.
 - Do not expose access tokens, API keys, or raw credentials.
 - Do not bypass DealMachine authentication, plan limits, or credit controls.
