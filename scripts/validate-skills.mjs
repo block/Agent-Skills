@@ -11,6 +11,7 @@ const MAX_FILES_PER_SKILL = 400;
 // Binary masquerading sampling (keep fast + predictable)
 const TEXT_SAMPLE_MAX_BYTES = 64 * 1024;
 const MIN_PRINTABLE_RATIO = 0.8;
+const CONTROL_CHARACTER_RE = /\p{Cc}/u;
 // NOTE: validate-skills currently does FAIL-only reporting.
 // We log encoding weirdness as a warning to stdout (does not fail).
 const UTF8_REPLACEMENT_WARN_RATIO = 0.02;
@@ -104,24 +105,31 @@ function detectMagic(buf) {
 
 function analyzeTextlikeness(buf) {
   let nulFound = false;
-  let printable = 0;
-
-  for (let i = 0; i < buf.length; i++) {
-    const c = buf[i];
-    if (c === 0) nulFound = true;
-
-    // printable ASCII + common whitespace
-    const isPrintable =
-      (c >= 0x20 && c <= 0x7e) || c === 0x09 || c === 0x0a || c === 0x0d;
-    if (isPrintable) printable++;
+  for (const byte of buf) {
+    if (byte === 0) nulFound = true;
   }
-
-  const printableRatio = buf.length ? printable / buf.length : 1;
 
   // best-effort encoding sanity check
   const text = buf.toString("utf8");
-  const repl = (text.match(/\uFFFD/g) || []).length;
-  const replacementRatio = text.length ? repl / text.length : 0;
+  let printable = 0;
+  let replacements = 0;
+  let codePoints = 0;
+
+  for (const char of text) {
+    const codePoint = char.codePointAt(0);
+    codePoints++;
+
+    if (codePoint === 0xfffd) replacements++;
+
+    const isAllowedWhitespace =
+      codePoint === 0x09 || codePoint === 0x0a || codePoint === 0x0d;
+    const isControl = CONTROL_CHARACTER_RE.test(char);
+    const isPrintable = isAllowedWhitespace || (!isControl && codePoint !== 0xfffd);
+    if (isPrintable) printable++;
+  }
+
+  const printableRatio = codePoints ? printable / codePoints : 1;
+  const replacementRatio = codePoints ? replacements / codePoints : 0;
 
   return { nulFound, printableRatio, replacementRatio };
 }
