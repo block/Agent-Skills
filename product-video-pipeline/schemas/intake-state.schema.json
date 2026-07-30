@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "intake-state.schema.json",
+  "title": "Product video intake state",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_id",
+    "preproduction_revision",
+    "updated_at",
+    "decisions",
+    "stages"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preproduction_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "updated_at": {
+      "type": ["string", "null"]
+    },
+    "delegation": {
+      "$ref": "common.schema.json#/$defs/decision"
+    },
+    "decisions": {
+      "type": "object",
+      "required": [
+        "video_type",
+        "primary_goal",
+        "audience",
+        "hybrid_priority",
+        "platforms",
+        "canvas",
+        "duration",
+        "language",
+        "narration",
+        "captions",
+        "deliverables",
+        "aigc_policy"
+      ],
+      "properties": {
+        "video_type": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "primary_goal": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "audience": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "hybrid_priority": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "platforms": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "canvas": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "duration": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "language": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "narration": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "captions": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "deliverables": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "aigc_policy": {
+          "$ref": "common.schema.json#/$defs/decision"
+        }
+      },
+      "additionalProperties": false
+    },
+    "stages": {
+      "type": "object",
+      "required": ["P0", "P1", "P2", "P3", "P3_5", "P4", "P5", "P6"],
+      "properties": {
+        "P0": {
+          "enum": ["pending", "awaiting_user", "confirmed", "not_applicable", "invalidated"]
+        },
+        "P1": {
+          "enum": ["pending", "awaiting_user", "confirmed", "not_applicable", "invalidated"]
+        },
+        "P2": {
+          "enum": ["pending", "awaiting_user", "confirmed", "not_applicable", "invalidated"]
+        },
+        "P3": {
+          "enum": ["pending", "awaiting_user", "confirmed", "not_applicable", "invalidated"]
+        },
+        "P3_5": {
+          "enum": ["pending", "awaiting_user", "confirmed", "not_applicable", "invalidated"]
+        },
+        "P4": {
+          "enum": ["pending", "awaiting_user", "confirmed", "not_applicable", "invalidated"]
+        },
+        "P5": {
+          "enum": ["pending", "awaiting_user", "confirmed", "not_applicable", "invalidated"]
+        },
+        "P6": {
+          "enum": ["pending", "awaiting_user", "confirmed", "not_applicable", "invalidated"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

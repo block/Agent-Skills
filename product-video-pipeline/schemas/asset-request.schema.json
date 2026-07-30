@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "asset-request.schema.json",
+  "title": "User-first asset request",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_id",
+    "preproduction_revision",
+    "assets"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preproduction_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "asset_id",
+          "asset_kind",
+          "purpose",
+          "script_unit_ids",
+          "ae_candidate_ids",
+          "requiredness",
+          "recommendation_tier",
+          "recommended_provider",
+          "accepted_provider",
+          "provider_acceptance",
+          "user_can_provide",
+          "user_will_provide",
+          "why_user_provided",
+          "spec",
+          "status",
+          "artifact_ref",
+          "fallback",
+          "factuality_role",
+          "aigc_policy",
+          "rights_privacy"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "pattern": "^AS-[A-Za-z0-9_-]+$"
+          },
+          "asset_kind": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "script_unit_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ae_candidate_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiredness": {
+            "enum": ["must_have", "optional"]
+          },
+          "recommendation_tier": {
+            "enum": [
+              "USER_STRONGLY_RECOMMENDED",
+              "USER_PREFERRED",
+              "AGENT_SOURCE_AFTER_APPROVAL",
+              "AGENT_CREATE_DETERMINISTIC",
+              "AIGC_FALLBACK_WITH_CONSENT"
+            ]
+          },
+          "recommended_provider": {
+            "enum": [
+              "project_existing",
+              "user",
+              "agent_source",
+              "agent_deterministic",
+              "aigc"
+            ]
+          },
+          "accepted_provider": {
+            "enum": [
+              "pending",
+              "project_existing",
+              "user",
+              "agent_source",
+              "agent_deterministic",
+              "aigc"
+            ]
+          },
+          "provider_acceptance": {
+            "$ref": "common.schema.json#/$defs/decision"
+          },
+          "user_can_provide": {
+            "enum": ["yes", "no", "unknown", "not_applicable"]
+          },
+          "user_will_provide": {
+            "enum": ["yes", "no", "unknown", "not_applicable"]
+          },
+          "why_user_provided": {
+            "type": ["string", "null"]
+          },
+          "provider_override_reason": {
+            "type": ["string", "null"]
+          },
+          "spec": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "requested",
+              "available",
+              "approved",
+              "rejected",
+              "not_needed"
+            ]
+          },
+          "artifact_ref": {
+            "anyOf": [
+              {
+                "$ref": "common.schema.json#/$defs/artifact_ref"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fallback": {
+            "type": ["string", "null"]
+          },
+          "factuality_role": {
+            "enum": [
+              "evidence",
+              "brand_identity",
+              "exact_copy",
+              "person_or_voice",
+              "decorative",
+              "conceptual"
+            ]
+          },
+          "aigc_policy": {
+            "type": "object",
+            "required": [
+              "prohibited",
+              "allowed_by_user",
+              "consent",
+              "allowed_scope"
+            ],
+            "properties": {
+              "prohibited": {
+                "type": "boolean"
+              },
+              "allowed_by_user": {
+                "type": "boolean"
+              },
+              "consent": {
+                "$ref": "common.schema.json#/$defs/decision"
+              },
+              "allowed_scope": {
+                "type": ["string", "null"]
+              }
+            },
+            "additionalProperties": false
+          },
+          "rights_privacy": {
+            "type": "object",
+            "required": ["rights_status", "privacy_status", "notes"],
+            "properties": {
+              "rights_status": {
+                "enum": ["approved", "pending", "rejected", "not_applicable"]
+              },
+              "privacy_status": {
+                "enum": ["approved", "pending", "rejected", "not_applicable"]
+              },
+              "notes": {
+                "type": ["string", "null"]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,110 @@
+schema_version: "1.0"
+project_id: PROJECT_ID
+preproduction_revision: 1
+updated_at: null
+delegation:
+  value: false
+  state: not_applicable
+  receipt: null
+  rationale: null
+  updated_at: null
+decisions:
+  video_type:
+    value: null
+    state: missing_blocking
+    receipt: null
+    rationale: "Choose tutorial, promo, or hybrid."
+    updated_at: null
+  primary_goal:
+    value: null
+    state: missing_blocking
+    receipt: null
+    rationale: null
+    updated_at: null
+  audience:
+    value: null
+    state: missing_blocking
+    receipt: null
+    rationale: null
+    updated_at: null
+  hybrid_priority:
+    value: null
+    state: not_applicable
+    receipt: null
+    rationale: "Required only when video_type is hybrid."
+    updated_at: null
+  platforms:
+    value: []
+    state: missing_blocking
+    receipt: null
+    rationale: null
+    updated_at: null
+  canvas:
+    value:
+      width: null
+      height: null
+      orientation: null
+      aspect_ratio: null
+    state: missing_blocking
+    receipt: null
+    rationale: null
+    updated_at: null
+  duration:
+    value:
+      min_ms: null
+      target_ms: null
+      max_ms: null
+    state: missing_blocking
+    receipt: null
+    rationale: null
+    updated_at: null
+  language:
+    value: zh-CN
+    state: inferred_needs_confirmation
+    receipt: null
+    rationale: "Inferred from the conversation."
+    updated_at: null
+  narration:
+    value: undecided
+    state: missing_blocking
+    receipt: null
+    rationale: null
+    updated_at: null
+  captions:
+    value: undecided
+    state: missing_blocking
+    receipt: null
+    rationale: null
+    updated_at: null
+  deliverables:
+    value: []
+    state: missing_blocking
+    receipt: null
+    rationale: null
+    updated_at: null
+  aigc_policy:
+    value:
+      mode: ask_per_asset
+      allowed_categories: []
+      prohibited_categories:
+        - real_ui
+        - real_product_result
+        - logo
+        - exact_copy
+        - qr_or_link
+        - verified_data
+        - testimonial
+        - unconsented_person_or_voice
+    state: inferred_needs_confirmation
+    receipt: null
+    rationale: "Safe default; user confirmation is still required before use."
+    updated_at: null
+stages:
+  P0: awaiting_user
+  P1: pending
+  P2: pending
+  P3: pending
+  P3_5: pending
+  P4: pending
+  P5: pending
+  P6: pending

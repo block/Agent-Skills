@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "script.schema.json",
+  "title": "Product video script contract",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_id",
+    "preproduction_revision",
+    "script_id",
+    "version",
+    "video_type",
+    "approval",
+    "total_duration_ms",
+    "claims",
+    "cta",
+    "units"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preproduction_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "script_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "video_type": {
+      "enum": ["tutorial", "promo", "hybrid", null]
+    },
+    "creative_direction_id": {
+      "type": ["string", "null"]
+    },
+    "approval": {
+      "$ref": "common.schema.json#/$defs/decision"
+    },
+    "total_duration_ms": {
+      "type": ["integer", "null"],
+      "minimum": 1
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim_id", "text", "proof_type", "source_truth", "status"],
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "pattern": "^CL-[A-Za-z0-9_-]+$"
+          },
+          "text": {
+            "type": "string"
+          },
+          "proof_type": {
+            "enum": [
+              "real_ui",
+              "real_output",
+              "verified_data",
+              "approved_testimonial",
+              "physical_product",
+              "concept_only"
+            ]
+          },
+          "source_truth": {
+            "type": ["string", "null"]
+          },
+          "status": {
+            "enum": ["draft", "verified", "concept_labeled", "rejected"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "cta": {
+      "type": ["string", "null"]
+    },
+    "units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "unit_id",
+          "time_range_ms",
+          "narrative_job",
+          "visible_copy",
+          "voiceover",
+          "claim_ids",
+          "proof",
+          "emotion",
+          "action",
+          "asset_implications",
+          "effect_needs"
+        ],
+        "properties": {
+          "unit_id": {
+            "type": "string",
+            "pattern": "^SU-[A-Za-z0-9_-]+$"
+          },
+          "time_range_ms": {
+            "$ref": "common.schema.json#/$defs/time_range_ms"
+          },
+          "narrative_job": {
+            "type": "string"
+          },
+          "visible_copy": {
+            "type": ["string", "null"]
+          },
+          "voiceover": {
+            "type": ["string", "null"]
+          },
+          "claim_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "proof": {
+            "type": ["string", "null"]
+          },
+          "emotion": {
+            "type": ["string", "null"]
+          },
+          "action": {
+            "type": ["string", "null"]
+          },
+          "asset_implications": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "effect_needs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "effect_need_id",
+                "effect_type",
+                "criticality",
+                "reference_requirement",
+                "high_cost",
+                "preferred_tools"
+              ],
+              "properties": {
+                "effect_need_id": {
+                  "type": "string",
+                  "pattern": "^EN-[A-Za-z0-9_-]+$"
+                },
+                "effect_type": {
+                  "type": "string"
+                },
+                "criticality": {
+                  "enum": ["must_have", "optional"]
+                },
+                "reference_requirement": {
+                  "enum": ["required", "optional", "none"]
+                },
+                "high_cost": {
+                  "type": "boolean"
+                },
+                "preferred_tools": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

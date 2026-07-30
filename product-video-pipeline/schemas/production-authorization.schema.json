@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "production-authorization.schema.json",
+  "title": "Production authorization",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_id",
+    "preproduction_revision",
+    "authorization_id",
+    "status",
+    "basis",
+    "scope",
+    "bundle_sha256",
+    "confirmation_card",
+    "receipt",
+    "unresolved_blockers",
+    "accepted_risks",
+    "aigc_boundary_snapshot",
+    "authorized_at",
+    "revocation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preproduction_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "authorization_id": {
+      "type": ["string", "null"]
+    },
+    "status": {
+      "enum": ["pending", "approved", "revoked"]
+    },
+    "basis": {
+      "enum": [
+        "explicit_user",
+        "delegated_defaults",
+        "scoped_revision",
+        "pending"
+      ]
+    },
+    "scope": {
+      "type": "string"
+    },
+    "bundle_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "confirmation_card": {
+      "type": "object",
+      "required": ["path", "sha256", "presented_at"],
+      "properties": {
+        "path": {
+          "type": ["string", "null"]
+        },
+        "sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "presented_at": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "receipt": {
+      "anyOf": [
+        {
+          "$ref": "common.schema.json#/$defs/receipt"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "defaulted_decision_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unresolved_blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "accepted_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "aigc_boundary_snapshot": {
+      "type": "object"
+    },
+    "authorized_at": {
+      "type": ["string", "null"]
+    },
+    "revocation": {
+      "type": "object",
+      "required": ["revoked_at", "reason"],
+      "properties": {
+        "revoked_at": {
+          "type": ["string", "null"]
+        },
+        "reason": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

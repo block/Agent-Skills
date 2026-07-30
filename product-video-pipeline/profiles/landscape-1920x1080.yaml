@@ -1,0 +1,18 @@
+profile_id: landscape-1920x1080
+canvas:
+  width: 1920
+  height: 1080
+  aspect_ratio: "16:9"
+  orientation: horizontal
+frame_rate: 30
+pixel_format: yuv420p
+audio:
+  sample_rate: 48000
+safe_area:
+  top_px: 72
+  right_px: 96
+  bottom_px: 96
+  left_px: 96
+notes:
+  - Confirm presentation, web, or social player controls before placing captions.
+  - Do not inherit vertical-only QA thresholds.

@@ -1,0 +1,33 @@
+schema_version: "1.0"
+project_id: PROJECT_ID
+preproduction_revision: 1
+whole_film:
+  route:
+    value: null
+    state: missing_blocking
+    receipt: null
+    rationale: "For promos choose user_provided, agent_search, or none. Tutorials may use not_applicable."
+    updated_at: null
+  search_authorization:
+    value: false
+    state: not_applicable
+    receipt: null
+    rationale: null
+    updated_at: null
+  entries: []
+  selected_ids: []
+effects:
+  route:
+    value: null
+    state: missing_blocking
+    receipt: null
+    rationale: "After script approval choose user_provided, agent_search, none, or not_needed."
+    updated_at: null
+  search_authorization:
+    value: false
+    state: not_applicable
+    receipt: null
+    rationale: null
+    updated_at: null
+  entries: []
+  selected_ids: []

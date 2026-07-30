@@ -1,0 +1,21 @@
+schema_version: "1.0"
+project_id: PROJECT_ID
+preproduction_revision: 1
+authorization_id: null
+status: pending
+basis: pending
+scope: "Full production under the current preproduction bundle."
+bundle_sha256: null
+confirmation_card:
+  path: null
+  sha256: null
+  presented_at: null
+receipt: null
+defaulted_decision_paths: []
+unresolved_blockers: []
+accepted_risks: []
+aigc_boundary_snapshot: {}
+authorized_at: null
+revocation:
+  revoked_at: null
+  reason: null

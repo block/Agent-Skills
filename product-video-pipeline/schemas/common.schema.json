@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common.schema.json",
+  "title": "Product video common types",
+  "$defs": {
+    "receipt": {
+      "type": "object",
+      "required": ["actor", "quote"],
+      "properties": {
+        "actor": {
+          "enum": ["user", "agent", "system"]
+        },
+        "task_id": {
+          "type": ["string", "null"]
+        },
+        "message_id": {
+          "type": ["string", "null"]
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recorded_at": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "decision": {
+      "type": "object",
+      "required": ["value", "state"],
+      "properties": {
+        "value": {},
+        "state": {
+          "enum": [
+            "confirmed",
+            "inferred_needs_confirmation",
+            "defaulted_by_user_delegation",
+            "missing_blocking",
+            "not_applicable"
+          ]
+        },
+        "receipt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/receipt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rationale": {
+          "type": ["string", "null"]
+        },
+        "updated_at": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "artifact_ref": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "media_type": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "source_ref": {
+      "type": "object",
+      "required": ["type", "value"],
+      "properties": {
+        "type": {
+          "enum": ["url", "local_file", "named_work"]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "creator": {
+          "type": ["string", "null"]
+        },
+        "title": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "time_range_ms": {
+      "type": "object",
+      "required": ["in_ms", "out_ms"],
+      "properties": {
+        "in_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "out_ms": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "rights": {
+      "type": "object",
+      "required": ["reference_use", "commercial_reuse"],
+      "properties": {
+        "reference_use": {
+          "enum": ["inspiration_only", "licensed_reuse", "unknown"]
+        },
+        "commercial_reuse": {
+          "enum": ["approved", "not_approved", "unknown", "not_applicable"]
+        },
+        "evidence": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

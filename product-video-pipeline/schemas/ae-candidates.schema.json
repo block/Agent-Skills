@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ae-candidates.schema.json",
+  "title": "AE candidate contract",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_id",
+    "preproduction_revision",
+    "mode",
+    "preview_library",
+    "candidates"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preproduction_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "mode": {
+      "$ref": "common.schema.json#/$defs/decision"
+    },
+    "preview_library": {
+      "type": "object",
+      "required": [
+        "state",
+        "provided_by",
+        "root_path",
+        "index_path",
+        "preview_count",
+        "uploaded_at",
+        "indexed_at",
+        "notes"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "not_requested",
+            "requested",
+            "received",
+            "indexed",
+            "failed",
+            "not_required"
+          ]
+        },
+        "provided_by": {
+          "enum": ["user", null]
+        },
+        "root_path": {
+          "type": ["string", "null"]
+        },
+        "index_path": {
+          "type": ["string", "null"]
+        },
+        "preview_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uploaded_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "indexed_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "notes": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "candidate_id",
+          "title",
+          "preview",
+          "script_unit_ids",
+          "effect_need_ids",
+          "effect_reference_ids",
+          "role",
+          "selection",
+          "replacement_fields",
+          "source_package",
+          "dependencies",
+          "rights",
+          "fallback"
+        ],
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^AE-[A-Za-z0-9_-]+$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "preview": {
+            "$ref": "common.schema.json#/$defs/artifact_ref"
+          },
+          "preview_time_range_ms": {
+            "anyOf": [
+              {
+                "$ref": "common.schema.json#/$defs/time_range_ms"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "script_unit_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "effect_need_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "effect_reference_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "role": {
+            "type": "string"
+          },
+          "selection": {
+            "enum": ["candidate", "selected", "alternate", "excluded"]
+          },
+          "replacement_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_package": {
+            "type": "object",
+            "required": ["state", "path", "sha256"],
+            "properties": {
+              "state": {
+                "enum": ["present", "requested", "missing", "not_required"]
+              },
+              "path": {
+                "type": ["string", "null"]
+              },
+              "sha256": {
+                "type": ["string", "null"],
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "additionalProperties": false
+          },
+          "dependencies": {
+            "type": "object",
+            "required": [
+              "scan_state",
+              "ae_version",
+              "plugins",
+              "fonts",
+              "footage",
+              "expressions",
+              "color_space"
+            ],
+            "properties": {
+              "scan_state": {
+                "enum": ["pending", "passed", "failed", "not_applicable"]
+              },
+              "ae_version": {
+                "type": ["string", "null"]
+              },
+              "plugins": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "fonts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "footage": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "expressions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "color_space": {
+                "type": ["string", "null"]
+              }
+            },
+            "additionalProperties": false
+          },
+          "rights": {
+            "$ref": "common.schema.json#/$defs/rights"
+          },
+          "fallback": {
+            "type": "object",
+            "required": ["method", "tool", "quality_delta", "acceptance"],
+            "properties": {
+              "method": {
+                "type": ["string", "null"]
+              },
+              "tool": {
+                "type": ["string", "null"]
+              },
+              "quality_delta": {
+                "type": ["string", "null"]
+              },
+              "acceptance": {
+                "$ref": "common.schema.json#/$defs/decision"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
