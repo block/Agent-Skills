@@ -34,14 +34,38 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Untrusted checkout (PR head) into ./pr (ONLY for reading files)
-      - name: Checkout PR head into ./pr (untrusted)
+      # Materialize the untrusted PR tree without asking actions/checkout to
+      # cross the pull_request_target trust boundary. Nothing from ./pr is run.
+      - name: Materialize PR head into ./pr (untrusted data)
         if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v4
-        with:
-          ref: refs/pull/${{ github.event.pull_request.number }}/head
-          path: pr
-          fetch-depth: 0
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "Invalid PR number: $PR_NUMBER"
+            exit 1
+          fi
+          if [[ ! "$EXPECTED_HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid PR head SHA: $EXPECTED_HEAD_SHA"
+            exit 1
+          fi
+
+          git fetch --no-tags --depth=1 origin \
+            "+refs/pull/${PR_NUMBER}/head:refs/remotes/origin/pr/${PR_NUMBER}"
+
+          ACTUAL_HEAD_SHA="$(git rev-parse "refs/remotes/origin/pr/${PR_NUMBER}^{commit}")"
+          if [[ "$ACTUAL_HEAD_SHA" != "$EXPECTED_HEAD_SHA" ]]; then
+            echo "PR head changed while the workflow was starting."
+            echo "Expected: $EXPECTED_HEAD_SHA"
+            echo "Fetched:  $ACTUAL_HEAD_SHA"
+            exit 1
+          fi
+
+          git worktree add --detach pr "$ACTUAL_HEAD_SHA"
 
       - uses: actions/setup-node@v4
         with:
@@ -154,7 +178,7 @@ jobs:
 
           exit 0
 
-      - name: Validate changed skills only (fork PRs via ./pr)
+      - name: Validate changed skills only (fork PRs via trusted base validator)
         id: validate_fork
         if: steps.changed.outputs.changed_skills != '' && github.event_name == 'pull_request_target'
         continue-on-error: true
@@ -173,7 +197,7 @@ jobs:
             echo "Invalid CHANGED_SKILLS value: $CHANGED_SKILLS"
             code=2
           else
-            node scripts/validate-skills.mjs \
+            node ../scripts/validate-skills.mjs \
               --skills "$CHANGED_SKILLS" \
               --report "$SKILLS_VALIDATION_REPORT" \
               2>&1 | tee "$SKILLS_VALIDATION_OUTPUT"
