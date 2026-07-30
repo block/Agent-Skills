@@ -848,7 +848,6 @@ function main() {
     `📊 Status: ${report.status} | FAIL=${report.totals.failures} WARN=${report.totals.warnings} FILES=${report.totals.scannedFiles}`
   );
 
- sks
 }
 
 main();

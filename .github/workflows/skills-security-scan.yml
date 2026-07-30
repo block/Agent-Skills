@@ -28,12 +28,38 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout PR head into ./pr (untrusted)
-        uses: actions/checkout@v4
-        with:
-          ref: refs/pull/${{ github.event.pull_request.number }}/head
-          path: pr
-          fetch-depth: 0
+      # Fetch the PR ref as data and pin it to the event SHA. The scanner and
+      # every executable continue to come from the trusted base checkout.
+      - name: Materialize PR head into ./pr (untrusted data)
+        if: github.event_name == 'pull_request_target'
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "Invalid PR number: $PR_NUMBER"
+            exit 1
+          fi
+          if [[ ! "$EXPECTED_HEAD_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid PR head SHA: $EXPECTED_HEAD_SHA"
+            exit 1
+          fi
+
+          git fetch --no-tags --depth=1 origin \
+            "+refs/pull/${PR_NUMBER}/head:refs/remotes/origin/pr/${PR_NUMBER}"
+
+          ACTUAL_HEAD_SHA="$(git rev-parse "refs/remotes/origin/pr/${PR_NUMBER}^{commit}")"
+          if [[ "$ACTUAL_HEAD_SHA" != "$EXPECTED_HEAD_SHA" ]]; then
+            echo "PR head changed while the workflow was starting."
+            echo "Expected: $EXPECTED_HEAD_SHA"
+            echo "Fetched:  $ACTUAL_HEAD_SHA"
+            exit 1
+          fi
+
+          git worktree add --detach pr "$ACTUAL_HEAD_SHA"
 
       - name: Use Node
         uses: actions/setup-node@v4
@@ -46,29 +72,42 @@ jobs:
         run: |
           set -euo pipefail
 
-          base="${{ github.event.pull_request.base.sha }}"
-          head="${{ github.event.pull_request.head.sha }}"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            repo_root="."
+            changed_dirs="$(
+              find . -mindepth 2 -maxdepth 2 -type f -name SKILL.md \
+                -print \
+                | sed 's#^\./##' \
+                | cut -d/ -f1 \
+                | sort -u
+            )"
+          else
+            repo_root="pr"
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
 
-          changed_dirs="$(
-            git -C pr diff --name-only "$base" "$head" \
-              | awk -F/ 'NF>1 {print $1}' \
-              | sort -u \
-              | grep -vE '^\.(git|github)$' \
-              | grep -vE '^(scripts|node_modules)$' \
-              | grep -vE '^\.' \
-              || true
-          )"
+            changed_dirs="$(
+              git -C pr diff --name-only "$base" "$head" \
+                | awk -F/ 'NF>1 {print $1}' \
+                | sort -u \
+                | grep -vE '^\.(git|github)$' \
+                | grep -vE '^(scripts|node_modules)$' \
+                | grep -vE '^\.' \
+                || true
+            )"
+          fi
 
 
           skills=""
           for d in $changed_dirs; do
-            if [[ -d "pr/$d" ]]; then
+            if [[ -d "$repo_root/$d" ]]; then
               if [[ -z "$skills" ]]; then skills="$d"; else skills="$skills,$d"; fi
             fi
           done
 
           # Write back to output (must be done from the main runner context)
           echo "skills=$skills" >> "$GITHUB_OUTPUT"
+          echo "repo_root=$repo_root" >> "$GITHUB_OUTPUT"
           echo "Changed skills: $skills"
 
       - name: Initialize security report file
@@ -92,6 +131,7 @@ jobs:
         shell: bash
         env:
           SKILLS: ${{ steps.changed.outputs.skills }}
+          REPO_ROOT: ${{ steps.changed.outputs.repo_root }}
         run: |
           set -euo pipefail
 
@@ -100,9 +140,13 @@ jobs:
             echo "Invalid skills list: $SKILLS"
             exit 1
           fi
+          if [[ "$REPO_ROOT" != "." && "$REPO_ROOT" != "pr" ]]; then
+            echo "Invalid repository root: $REPO_ROOT"
+            exit 1
+          fi
 
           node scripts/skills-security-scan.mjs \
-            --repo-root pr \
+            --repo-root "$REPO_ROOT" \
             --skills "$SKILLS" \
             --report scripts/skills-security-report.json \
             --sarif  scripts/skills-security-report.sarif
@@ -120,7 +164,7 @@ jobs:
           fi
      
       - name: Upload SARIF to GitHub Code Scanning
-        if: always() && steps.changed.outputs.skills != '' && steps.sarifcheck.outputs.ok == 'true'
+        if: always() && github.event_name == 'pull_request_target' && steps.changed.outputs.skills != '' && steps.sarifcheck.outputs.ok == 'true'
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: scripts/skills-security-report.sarif
