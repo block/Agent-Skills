@@ -1,0 +1,19 @@
+schema_version: "1.0"
+project_id: PROJECT_ID
+preproduction_revision: 1
+mode:
+  value: null
+  state: missing_blocking
+  receipt: null
+  rationale: "Choose none, library, custom_ae, or deterministic_rebuild after effect needs are known."
+  updated_at: null
+preview_library:
+  state: not_requested
+  provided_by: null
+  root_path: null
+  index_path: null
+  preview_count: 0
+  uploaded_at: null
+  indexed_at: null
+  notes: "For library/custom_ae, request preview videos from the user before selection."
+candidates: []

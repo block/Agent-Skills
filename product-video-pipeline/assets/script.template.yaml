@@ -1,0 +1,17 @@
+schema_version: "1.0"
+project_id: PROJECT_ID
+preproduction_revision: 1
+script_id: SCRIPT-001
+version: 1
+video_type: null
+creative_direction_id: null
+approval:
+  value: draft
+  state: missing_blocking
+  receipt: null
+  rationale: null
+  updated_at: null
+total_duration_ms: null
+claims: []
+cta: null
+units: []

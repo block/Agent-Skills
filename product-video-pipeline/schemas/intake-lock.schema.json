@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "intake-lock.schema.json",
+  "title": "Generated preproduction lock",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_id",
+    "preproduction_revision",
+    "created_at",
+    "tool_version",
+    "input_hashes",
+    "bundle_sha256",
+    "authorization_hash",
+    "resolved_snapshot"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "preproduction_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "tool_version": {
+      "type": "string"
+    },
+    "input_hashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "bundle_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "authorization_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "resolved_snapshot": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

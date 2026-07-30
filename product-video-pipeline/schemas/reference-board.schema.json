@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reference-board.schema.json",
+  "title": "Whole-film and effect reference board",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_id",
+    "preproduction_revision",
+    "whole_film",
+    "effects"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preproduction_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "whole_film": {
+      "$ref": "#/$defs/reference_group"
+    },
+    "effects": {
+      "$ref": "#/$defs/reference_group"
+    }
+  },
+  "$defs": {
+    "reference_group": {
+      "type": "object",
+      "required": ["route", "search_authorization", "entries", "selected_ids"],
+      "properties": {
+        "route": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "search_authorization": {
+          "$ref": "common.schema.json#/$defs/decision"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reference_entry"
+          }
+        },
+        "selected_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(RF|FX)-[A-Za-z0-9_-]+$"
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "reference_entry": {
+      "type": "object",
+      "required": [
+        "reference_id",
+        "kind",
+        "source",
+        "selection",
+        "transferable_grammar",
+        "do_not_copy",
+        "novelty_delta",
+        "rights"
+      ],
+      "properties": {
+        "reference_id": {
+          "type": "string",
+          "pattern": "^(RF|FX)-[A-Za-z0-9_-]+$"
+        },
+        "kind": {
+          "enum": ["whole_film", "effect"]
+        },
+        "source": {
+          "$ref": "common.schema.json#/$defs/source_ref"
+        },
+        "source_time_range_ms": {
+          "anyOf": [
+            {
+              "$ref": "common.schema.json#/$defs/time_range_ms"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "script_unit_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "effect_need_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "effect_type": {
+          "type": ["string", "null"]
+        },
+        "borrowed_mechanic": {
+          "type": ["string", "null"]
+        },
+        "transferable_grammar": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "do_not_copy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "novelty_delta": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aspect_adaptation": {
+          "type": ["object", "null"],
+          "properties": {
+            "target_aspect": {
+              "type": ["string", "null"]
+            },
+            "difficulty": {
+              "enum": ["low", "medium", "high", "unknown"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "implementation_options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preferred_implementation": {
+          "type": ["string", "null"]
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fallback": {
+          "type": ["string", "null"]
+        },
+        "selection": {
+          "enum": ["candidate", "selected", "rejected"]
+        },
+        "rights": {
+          "$ref": "common.schema.json#/$defs/rights"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

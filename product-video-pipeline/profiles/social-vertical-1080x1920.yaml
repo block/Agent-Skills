@@ -1,0 +1,18 @@
+profile_id: social-vertical-1080x1920
+canvas:
+  width: 1080
+  height: 1920
+  aspect_ratio: "9:16"
+  orientation: vertical
+frame_rate: 30
+pixel_format: yuv420p
+audio:
+  sample_rate: 48000
+safe_area:
+  top_px: 180
+  right_px: 96
+  bottom_px: 300
+  left_px: 96
+notes:
+  - Confirm platform UI overlays before final subtitle and CTA placement.
+  - Do not crop horizontal UI into unreadable full-page miniatures.

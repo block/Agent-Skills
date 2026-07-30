@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product Video Pipeline"
+  short_description: "Plan, produce, revise, and QA product videos"
+  default_prompt: "Use $product-video-pipeline to turn my product, feature, or workflow into the right script, asset plan, or finished video."
