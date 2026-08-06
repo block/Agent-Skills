@@ -2,7 +2,37 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const REPO_ROOT = process.cwd();
+/**
+ * CLI
+ *  --repo-root path                Treat this directory as repo root (fork-safe validation)
+ *
+ * Note: the workflow also passes --skills and --report. Neither is implemented here:
+ * validation always covers every skill dir under the repo root, and the report summary
+ * is written by the workflow. Left as-is so this change does not narrow coverage.
+ */
+function parseArgs(argv) {
+  const args = { repoRoot: null, sawRepoRoot: false };
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === "--repo-root") {
+      args.sawRepoRoot = true;
+      args.repoRoot = (argv[++i] || "").trim();
+    }
+  }
+  return args;
+}
+
+const { repoRoot: repoRootArg, sawRepoRoot } = parseArgs(process.argv.slice(2));
+
+// An empty --repo-root must not silently fall back to cwd: in the fork job cwd is the
+// *base* checkout, so we would validate the trusted tree and pass the untrusted one.
+if (sawRepoRoot && !repoRootArg) {
+  console.error("❌ --repo-root was passed without a value");
+  process.exit(2);
+}
+
+// Repo root (fork-safe): a fork's tree is validated by pointing this trusted copy of the
+// script at it, never by executing the copy of the script that lives inside that tree.
+const REPO_ROOT = repoRootArg ? path.resolve(repoRootArg) : process.cwd();
 const SKILLS_ROOT = REPO_ROOT;
 
 const MAX_FILE_BYTES = 1_000_000;
@@ -255,6 +285,11 @@ function walkDir(dir, relativeBase) {
 }
 
 function main() {
+  if (!fs.existsSync(SKILLS_ROOT) || !fs.statSync(SKILLS_ROOT).isDirectory()) {
+    fail(`Repo root is not a directory: ${SKILLS_ROOT}`);
+    process.exit(1);
+  }
+
   const rootEntries = fs.readdirSync(SKILLS_ROOT, { withFileTypes: true });
 
   const skillDirs = rootEntries

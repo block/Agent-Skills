@@ -163,7 +163,6 @@ jobs:
           SKILLS_VALIDATION_OUTPUT: ${{ runner.temp }}/skills-validation-output.txt
           CHANGED_SKILLS: ${{ steps.changed.outputs.changed_skills }}
         shell: bash
-        working-directory: pr
         run: |
           set -euo pipefail
           set +e
@@ -173,7 +172,10 @@ jobs:
             echo "Invalid CHANGED_SKILLS value: $CHANGED_SKILLS"
             code=2
           else
+            # ✅ Trusted script from the base checkout, reading the untrusted tree as data.
+            # Never run ./pr's copy of the validator — that executes fork-authored code.
             node scripts/validate-skills.mjs \
+              --repo-root pr \
               --skills "$CHANGED_SKILLS" \
               --report "$SKILLS_VALIDATION_REPORT" \
               2>&1 | tee "$SKILLS_VALIDATION_OUTPUT"
