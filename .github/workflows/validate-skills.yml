@@ -34,14 +34,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Untrusted checkout (PR head) into ./pr (ONLY for reading files)
-      - name: Checkout PR head into ./pr (untrusted)
+      # Materialize the PR head as data without asking actions/checkout to run in
+      # the privileged pull_request_target context. All executable validation code
+      # continues to come from the trusted base checkout.
+      - name: Materialize PR head into ./pr (untrusted data)
         if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v4
-        with:
-          ref: refs/pull/${{ github.event.pull_request.number }}/head
-          path: pr
-          fetch-depth: 0
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "Invalid pull request number: $PR_NUMBER"
+            exit 1
+          fi
+          git fetch --no-tags --depth=1 origin \
+            "refs/pull/${PR_NUMBER}/head:refs/remotes/origin/pr-head"
+          git worktree add --detach pr refs/remotes/origin/pr-head
 
       - uses: actions/setup-node@v4
         with:
@@ -65,8 +74,7 @@ jobs:
 
           elif [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
             BASE="${{ github.event.pull_request.base.sha }}"
-            HEAD="${{ github.event.pull_request.head.sha }}"
-            CHANGED_FILES="$(git -C pr diff --name-only --diff-filter=$DIFF_FILTER "$BASE..$HEAD" || true)"
+            CHANGED_FILES="$(git diff --name-only --diff-filter=$DIFF_FILTER "$BASE..refs/remotes/origin/pr-head" || true)"
 
           else
             BEFORE="${{ github.event.before }}"
@@ -163,17 +171,18 @@ jobs:
           SKILLS_VALIDATION_OUTPUT: ${{ runner.temp }}/skills-validation-output.txt
           CHANGED_SKILLS: ${{ steps.changed.outputs.changed_skills }}
         shell: bash
-        working-directory: pr
         run: |
           set -euo pipefail
           set +e
+
+          cd pr
 
           # ✅ Strictly validate: comma-separated skill dir names (no spaces, no weird chars)
           if [[ ! "$CHANGED_SKILLS" =~ ^[A-Za-z0-9._/-]+(,[A-Za-z0-9._/-]+)*$ ]]; then
             echo "Invalid CHANGED_SKILLS value: $CHANGED_SKILLS"
             code=2
           else
-            node scripts/validate-skills.mjs \
+            node "$GITHUB_WORKSPACE/scripts/validate-skills.mjs" \
               --skills "$CHANGED_SKILLS" \
               --report "$SKILLS_VALIDATION_REPORT" \
               2>&1 | tee "$SKILLS_VALIDATION_OUTPUT"

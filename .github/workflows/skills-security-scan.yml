@@ -28,12 +28,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout PR head into ./pr (untrusted)
-        uses: actions/checkout@v4
-        with:
-          ref: refs/pull/${{ github.event.pull_request.number }}/head
-          path: pr
-          fetch-depth: 0
+      # Fetch the PR ref with trusted git configuration and materialize it only as
+      # input data. The scanner executed below remains the base branch's version.
+      - name: Materialize PR head into ./pr (untrusted data)
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "Invalid pull request number: $PR_NUMBER"
+            exit 1
+          fi
+          git fetch --no-tags --depth=1 origin \
+            "refs/pull/${PR_NUMBER}/head:refs/remotes/origin/pr-head"
+          git worktree add --detach pr refs/remotes/origin/pr-head
 
       - name: Use Node
         uses: actions/setup-node@v4
@@ -47,10 +56,8 @@ jobs:
           set -euo pipefail
 
           base="${{ github.event.pull_request.base.sha }}"
-          head="${{ github.event.pull_request.head.sha }}"
-
           changed_dirs="$(
-            git -C pr diff --name-only "$base" "$head" \
+            git diff --name-only "$base" refs/remotes/origin/pr-head \
               | awk -F/ 'NF>1 {print $1}' \
               | sort -u \
               | grep -vE '^\.(git|github)$' \
