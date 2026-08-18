@@ -38,7 +38,7 @@ This will install the skill locally so compatible agents (like Goose or Claude D
 ## Browse Skills
 
 You can browse all available skills via the Goose Skills Marketplace:
-👉 https://block.github.io/goose/skills
+👉 https://goose-docs.ai/skills/
 
 There you can:
 
@@ -46,7 +46,7 @@ There you can:
 
 - Copy the install command
 
-- View source on GitH
+- View source on GitHub
 
 ## Contributing a Skill
 
@@ -60,7 +60,7 @@ If you’ve built a useful workflow, checklist, or guide that could help other a
 2. Create a new branch for your skill
 3. Add your skill folder (with `SKILL.md` and any supporting files)
 4. Commit your changes
-5. [Open a pull request](https://github.com/block/Agent-Skills/compare/main...your-branch?expand=1)  
+5. [Open a pull request](https://github.com/block/agent-skills/compare)
 
 #### Skill requirements (quick version)
 
