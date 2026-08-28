@@ -2,7 +2,7 @@
 name: hol-guard
 description: Protect supported AI coding-agent harnesses with HOL Guard and scan skills, plugins, MCP servers, and agent packages before trust.
 author: hashgraph-online
-version: "1.0"
+version: "1.1"
 tags:
 - security
 - agent-security
@@ -26,11 +26,11 @@ pipx install hol-guard
 pipx install plugin-scanner
 ```
 
-Verify both commands independently:
+Verify both commands independently by invoking each CLI directly so the check works across supported shells:
 
 ```bash
-command -v hol-guard
-command -v plugin-scanner
+hol-guard --version
+plugin-scanner --version
 hol-guard status
 hol-guard detect --json
 ```
