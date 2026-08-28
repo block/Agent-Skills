@@ -2,7 +2,7 @@
 name: hol-guard
 description: Protect supported AI coding-agent harnesses with HOL Guard and scan skills, plugins, MCP servers, and agent packages before trust.
 author: hashgraph-online
-version: "1.1"
+version: "1.2"
 tags:
 - security
 - agent-security
@@ -87,7 +87,7 @@ If Guard blocks or queues an action, inspect the request before resolving it:
 
 ```bash
 hol-guard approvals
-hol-guard approvals open
+hol-guard approvals open <request-id>
 hol-guard receipts
 hol-guard diff <harness>
 ```
